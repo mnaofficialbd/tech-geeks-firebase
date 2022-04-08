@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import Logo from "../../Assets/Image/logo.png";
 import "./Navbar.css";
 import { useLocation } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/Firebase.init";
 
 const Navbar = () => {
   const { pathname } = useLocation();
+
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.log(user);
+      } else {
+        
+      }
+    });
+  },[])
 
   return (
     <nav

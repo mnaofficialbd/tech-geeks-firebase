@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { BlogContext } from "../../App";
 import "./BlogDetails.css";
-import { BsChevronLeft } from "react-icons/bs";
+// import { BsChevronLeft } from "react-icons/bs";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -22,7 +22,7 @@ const BlogDetails = () => {
       <div className='header-gradient' />
       <div>
         <button className='back-button' onClick={() => navigate(-1)}>
-          <BsChevronLeft />
+          {/* <BsChevronLeft /> */}
           <p>Back</p>
         </button>
         <div className='blog-details'>
