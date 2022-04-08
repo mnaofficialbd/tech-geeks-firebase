@@ -1,77 +1,104 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GoogleLogo from "../../Assets/Image/google.svg";
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../../firebase/Firebase.init";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { auth } from "../../Firebase/Firebase.init";
+import toast from "react-hot-toast";
+import { AiOutlineExclamationCircle } from "react-icons/ai";
 
 const provider = new GoogleAuthProvider();
 
-
 const Signup = () => {
+  const [email, setEmail] = useState({ value: "", error: "" });
+  const [password, setPassword] = useState({ value: "", error: "" });
+  const [passwordConfirmation, setPasswordConfirmation] = useState({
+    value: "",
+    error: "",
+  });
+
   const navigate = useNavigate();
-  const [email, setEmail] = useState({ value: "", error: "" })
-  const [password, setPassword] = useState({ value: "", error: "" })
-  const [confirmPassword, setConfirmPassword] = useState({ value: "", error: "" })
 
   const googleAuth = () => {
-
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
-        navigate("/")
-      }).catch((error) => {
-        const errorMessage = error.message;
+        // ...
+        console.log(user);
+        navigate("/");
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        console.error(error);
       });
-  }
+  };
 
-  const handleEmail = (emailInput) => {
+  const handleEmail = (event) => {
+    const emailInput = event.target.value;
     if (/\S+@\S+\.\S+/.test(emailInput)) {
       setEmail({ value: emailInput, error: "" });
+    } else {
+      setEmail({ value: "", error: "Please Provide a valid Email" });
     }
-    else {
-      setEmail({ value: "", error: "Invalid Email" });
-    }
-  }
-  const handlePassword = (passwordInput) => {
-    setPassword(passwordInput);
+  };
+  const handlePassword = (event) => {
+    const passwordInput = event.target.value;
+
     if (passwordInput.length < 7) {
       setPassword({ value: "", error: "Password too short" });
-    }
-    else {
+    } else if (!/(?=.*[A-Z])/.test(passwordInput)) {
+      setPassword({
+        value: "",
+        error: "Password must contain a capital letter",
+      });
+    } else {
       setPassword({ value: passwordInput, error: "" });
     }
-  }
-  const handleConfirmPassword = (confirmPasswordInput) => {
-    if (confirmPasswordInput === password.value) {
-      setConfirmPassword({ value: confirmPasswordInput, error: "" });
-    }
-    else{
-      setConfirmPassword({ value: "", error: "Password Mismatched" });
+  };
+  const handleConfirmPassword = (event) => {
+    const confirmationInput = event.target.value;
 
+    if (confirmationInput !== password.value) {
+      setPasswordConfirmation({ value: "", error: "Password Mismatched" });
+    } else {
+      setPasswordConfirmation({ value: confirmationInput, error: "" });
     }
-  }
+  };
 
   const handleSignup = (event) => {
-    event.preventDefault()
-
+    event.preventDefault();
     if (email.value === "") {
-      setEmail({ value: "", error: "Email is require" })
+      setEmail({ value: "", error: "Email is required" });
     }
     if (password.value === "") {
-      setPassword({ value: "", error: "Password is require" })
+      setPassword({ value: "", error: "Password is required" });
     }
-
-    if (email.value && password.value && confirmPassword.value===password.value) {
+    if (passwordConfirmation.value === "") {
+      setPasswordConfirmation({
+        value: "",
+        error: "Password confirmation is required",
+      });
+    }
+    if (email.value && password.value === passwordConfirmation.value) {
       createUserWithEmailAndPassword(auth, email.value, password.value)
         .then((userCredential) => {
           const user = userCredential.user;
+          toast.success("Account created", { id: "created" });
+          navigate("/");
         })
         .catch((error) => {
-          const errorCode = error.code;
           const errorMessage = error.message;
+          if (errorMessage.includes("already-in-use")) {
+            toast.error("Email already in use", { id: "error" });
+          } else {
+            toast.error(errorMessage, { id: "error" });
+          }
         });
     }
-  }
+  };
 
   return (
     <div className='auth-form-container '>
@@ -81,23 +108,50 @@ const Signup = () => {
           <div className='input-field'>
             <label htmlFor='email'>Email</label>
             <div className='input-wrapper'>
-              <input type='text' name='email' id='email' onBlur={(event) => handleEmail(event.target.value)} />
+              <input
+                onBlur={handleEmail}
+                type='email'
+                name='email'
+                id='email'
+              />
             </div>
-            {email?.error && <p className="error">{email.error}</p>}
+            {email.error && (
+              <p className='error'>
+                <AiOutlineExclamationCircle /> {email.error}
+              </p>
+            )}
           </div>
           <div className='input-field'>
             <label htmlFor='password'>Password</label>
             <div className='input-wrapper'>
-              <input type='password' name='password' id='password' onBlur={(event) => handlePassword(event.target.value)} />
+              <input
+                onBlur={handlePassword}
+                type='password'
+                name='password'
+                id='password'
+              />
             </div>
-            {password?.error && <p className="error">{password.error}</p>}
+            {password.error && (
+              <p className='error'>
+                <AiOutlineExclamationCircle /> {password.error}
+              </p>
+            )}
           </div>
           <div className='input-field'>
             <label htmlFor='confirm-password'>Confirm Password</label>
             <div className='input-wrapper'>
-              <input type='password' name='confirmPassword' id='confirm-password' onBlur={(event) => handleConfirmPassword(event.target.value)} />
+              <input
+                onBlur={handleConfirmPassword}
+                type='password'
+                name='confirmPassword'
+                id='confirm-password'
+              />
             </div>
-            {confirmPassword?.error && <p className="error">{confirmPassword.error}</p>}
+            {passwordConfirmation.error && (
+              <p className='error'>
+                <AiOutlineExclamationCircle /> {passwordConfirmation.error}
+              </p>
+            )}
           </div>
           <button type='submit' className='auth-form-submit'>
             Sign Up
