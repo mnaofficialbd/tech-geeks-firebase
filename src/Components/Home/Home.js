@@ -8,7 +8,7 @@ const Home = () => {
   const [blogs, setBlogs] = useContext(BlogContext);
 
   useEffect(() => {
-    fetch("https://retro-tech-talks.herokuapp.com/blogs")
+    fetch('data.json')
       .then((res) => res.json())
       .then((data) => setBlogs(data));
   }, []);

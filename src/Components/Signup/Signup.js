@@ -15,22 +15,25 @@ const googleAuth=()=>{
   signInWithPopup(auth, provider)
   .then((result) => {
     const user = result.user;
-    console.log(user);
+    navigate("/")
   }).catch((error) => {
     const errorMessage = error.message;
-    console.log(errorMessage);
   });
+}
+
+const handleSignup =(event)=>{
+  event.preventDefault()
 }
 
   return (
     <div className='auth-form-container '>
       <div className='auth-form'>
         <h1>Sign Up</h1>
-        <form>
+        <form onSubmit={handleSignup}>
           <div className='input-field'>
             <label htmlFor='email'>Email</label>
             <div className='input-wrapper'>
-              <input type='email' name='email' id='email' />
+              <input type='text' name='email' id='email' />
             </div>
           </div>
           <div className='input-field'>
