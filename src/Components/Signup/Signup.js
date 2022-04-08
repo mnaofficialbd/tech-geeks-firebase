@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import GoogleLogo from "../../Assets/Image/google.svg";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase/Firebase.init";
 
 const provider = new GoogleAuthProvider();
@@ -23,6 +23,18 @@ const googleAuth=()=>{
 
 const handleSignup =(event)=>{
   event.preventDefault()
+  const email=event.target.email.value;
+  const password=event.target.password.value;
+  
+  createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    const user = userCredential.user;
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+  });
+
 }
 
   return (
